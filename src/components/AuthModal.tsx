@@ -4,7 +4,8 @@ import {
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   signInWithPopup, 
-  updateProfile 
+  updateProfile,
+  sendPasswordResetEmail
 } from "firebase/auth";
 import { X, Mail, Lock, User, Sparkles, AlertCircle, Chrome } from "lucide-react";
 
@@ -19,9 +20,35 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState("");
+  const [resetSuccess, setResetSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      setError("Şifre sıfırlama bağlantısı göndermek için lütfen önce E-posta adresinizi yazın.");
+      return;
+    }
+    setError("");
+    setResetSuccess("");
+    setLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, email.trim());
+      setResetSuccess("Şifre sıfırlama bağlantısı e-posta adresinize gönderildi! Lütfen gelen kutunuzu (ve spam klasörünü) kontrol edin.");
+    } catch (err: any) {
+      console.error(err);
+      let errorMsg = "Şifre sıfırlama e-postası gönderilirken bir hata oluştu.";
+      if (err.code === "auth/user-not-found") {
+        errorMsg = "Bu e-posta adresine kayıtlı bir kullanıcı bulunamadı.";
+      } else if (err.code === "auth/invalid-email") {
+        errorMsg = "Geçersiz e-posta adresi.";
+      }
+      setError(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,6 +140,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </div>
           )}
 
+          {resetSuccess && (
+            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl text-sm flex gap-2 items-start">
+              <span className="text-emerald-400 font-bold">✓</span>
+              <span>{resetSuccess}</span>
+            </div>
+          )}
+
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
@@ -163,6 +197,18 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   required
                 />
               </div>
+              {isLogin && (
+                <div className="flex justify-end mt-1.5">
+                  <button
+                    id="forgot-password-btn"
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="text-xs text-sky-400 hover:text-sky-300 hover:underline transition-colors focus:outline-none cursor-pointer"
+                  >
+                    Şifremi Unuttum?
+                  </button>
+                </div>
+              )}
             </div>
 
             <button
