@@ -24,6 +24,8 @@ import {
 import AuthModal from "./components/AuthModal";
 import CreatePollModal from "./components/CreatePollModal";
 import PollCard, { VerifiedGoldBadge } from "./components/PollCard";
+import Avatar from "./components/Avatar";
+import ProfileModal from "./components/ProfileModal";
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -35,6 +37,7 @@ export default function App() {
   // Modals state
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   // Copy-link notifications
   const [toastMessage, setToastMessage] = useState("");
@@ -75,6 +78,9 @@ export default function App() {
             votesB: data.votesB || 0,
             createdBy: data.createdBy,
             creatorName: data.creatorName || "Anonim",
+            creatorEmail: data.creatorEmail || "",
+            creatorAvatar: data.creatorAvatar || "",
+            isVerifiedCreator: data.isVerifiedCreator || false,
             createdAt: data.createdAt,
             voters: data.voters || {},
           });
@@ -172,31 +178,41 @@ export default function App() {
           <div className="flex items-center gap-2 md:gap-4">
 
             {user ? (
-              <div className="flex items-center gap-2">
-                {/* User Info (hidden on small screens) */}
-                <div className="hidden sm:flex flex-col items-end text-right">
-                  {user.email?.toLowerCase() === "ducknet53@gmail.com" ? (
-                    <span className="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-[0_0_10px_rgba(245,158,11,0.15)]">
-                      {user.displayName || "ducknet53"}
-                      <VerifiedGoldBadge />
+              <div className="flex items-center gap-2 md:gap-3">
+                {/* Interactive Profile Area */}
+                <button
+                  id="header-profile-btn"
+                  onClick={() => setIsProfileOpen(true)}
+                  className="flex items-center gap-2 p-1 md:p-1.5 pr-2 md:pr-3 bg-slate-950/60 hover:bg-slate-900/80 text-left border border-slate-800/80 hover:border-sky-500/30 rounded-2xl transition-all cursor-pointer group"
+                  title="Profil Ayarlarını Aç"
+                >
+                  <Avatar photoURL={user.photoURL} displayName={user.displayName} size="sm" />
+                  <div className="flex flex-col">
+                    {user.email?.toLowerCase() === "ducknet53@gmail.com" ? (
+                      <span className="text-xs font-bold text-amber-400 flex items-center gap-1">
+                        {user.displayName || "ducknet53"}
+                        <VerifiedGoldBadge />
+                      </span>
+                    ) : (
+                      <span className="text-xs font-bold text-slate-200 group-hover:text-sky-400 transition-colors truncate max-w-[80px] sm:max-w-[120px]">
+                        {user.displayName || user.email?.split("@")[0]}
+                      </span>
+                    )}
+                    <span className="text-[9px] text-slate-500 font-mono leading-none mt-0.5">
+                      {user.email?.toLowerCase() === "ducknet53@gmail.com" ? "Yönetici 👑" : "Profil Ayarları ⚙️"}
                     </span>
-                  ) : (
-                    <span className="text-xs font-semibold text-slate-300">
-                      {user.displayName || user.email?.split("@")[0]}
-                    </span>
-                  )}
-                  <span className="text-[10px] text-slate-500 font-mono">
-                    {user.email?.toLowerCase() === "ducknet53@gmail.com" ? "Yönetici" : "Oyuncu"}
-                  </span>
-                </div>
+                  </div>
+                </button>
+
                 {/* Logout Button */}
                 <button
                   id="logout-btn"
                   onClick={handleLogout}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-rose-950/30 text-slate-400 hover:text-rose-400 border border-slate-800 hover:border-rose-500/20 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 px-2.5 py-2 bg-slate-900 hover:bg-rose-950/30 text-slate-400 hover:text-rose-400 border border-slate-800 hover:border-rose-500/20 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+                  title="Çıkış Yap"
                 >
                   <LogOut className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Çıkış Yap</span>
+                  <span className="hidden md:inline">Çıkış</span>
                 </button>
               </div>
             ) : (
@@ -450,6 +466,13 @@ export default function App() {
         userId={user?.uid || ""}
         userDisplayName={user?.displayName || null}
         userEmail={user?.email || null}
+        userPhotoURL={user?.photoURL || null}
+      />
+
+      <ProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+        currentUser={user}
       />
 
     </div>

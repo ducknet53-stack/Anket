@@ -9,9 +9,10 @@ interface CreatePollModalProps {
   userId: string;
   userDisplayName: string | null;
   userEmail: string | null;
+  userPhotoURL: string | null;
 }
 
-export default function CreatePollModal({ isOpen, onClose, userId, userDisplayName, userEmail }: CreatePollModalProps) {
+export default function CreatePollModal({ isOpen, onClose, userId, userDisplayName, userEmail, userPhotoURL }: CreatePollModalProps) {
   const [question, setQuestion] = useState("");
   const [optionA, setOptionA] = useState("");
   const [optionB, setOptionB] = useState("");
@@ -33,7 +34,7 @@ export default function CreatePollModal({ isOpen, onClose, userId, userDisplayNa
 
     try {
       const isVerified = userEmail?.toLowerCase() === "ducknet53@gmail.com";
-      const creatorName = isVerified ? "ducknet53" : (userDisplayName || (userEmail ? userEmail.split("@")[0] : "Anonim"));
+      const creatorName = userDisplayName || (isVerified ? "ducknet53" : (userEmail ? userEmail.split("@")[0] : "Anonim"));
       
       const newPoll = {
         question: question.trim(),
@@ -44,6 +45,7 @@ export default function CreatePollModal({ isOpen, onClose, userId, userDisplayNa
         createdBy: userId,
         creatorName: creatorName,
         creatorEmail: userEmail || "",
+        creatorAvatar: userPhotoURL || "",
         isVerifiedCreator: isVerified,
         createdAt: serverTimestamp(),
         voters: {}

@@ -8,6 +8,7 @@ export interface Poll {
   createdBy: string;
   creatorName: string;
   creatorEmail?: string;
+  creatorAvatar?: string;
   isVerifiedCreator?: boolean;
   createdAt: any; // Firestore Timestamp
   voters: Record<string, number>; // userId -> 0 (optionA) or 1 (optionB)
