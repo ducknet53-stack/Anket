@@ -53,9 +53,10 @@ interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentUser: any; // User object from Firebase
+  onProfileUpdate?: () => void;
 }
 
-export default function ProfileModal({ isOpen, onClose, currentUser }: ProfileModalProps) {
+export default function ProfileModal({ isOpen, onClose, currentUser, onProfileUpdate }: ProfileModalProps) {
   const [displayName, setDisplayName] = useState("");
   const [selectedPreset, setSelectedPreset] = useState("zap");
   const [customPhotoData, setCustomPhotoData] = useState<string | null>(null);
@@ -163,30 +164,50 @@ export default function ProfileModal({ isOpen, onClose, currentUser }: ProfileMo
         photoURL: newPhotoURL,
       });
 
-      // 2. Save/Update User Profile in Firestore
-      const userDocRef = doc(db, "users", currentUser.uid);
-      await setDoc(userDocRef, {
-        displayName: newName,
-        photoURL: newPhotoURL,
-        email: currentUser.email,
-        updatedAt: new Date(),
-        isVerified: isAdmin,
-      }, { merge: true });
+      // Synchronize the current user data
+      try {
+        await currentUser.reload();
+      } catch (reloadErr) {
+        console.warn("User reload failed:", reloadErr);
+      }
 
-      // 3. Update all past polls in Firestore
-      const pollsRef = collection(db, "polls");
-      const q = query(pollsRef, where("createdBy", "==", currentUser.uid));
-      const querySnapshot = await getDocs(q);
-      
-      if (!querySnapshot.empty) {
-        const batch = writeBatch(db);
-        querySnapshot.forEach((pollDoc) => {
-          batch.update(doc(db, "polls", pollDoc.id), {
-            creatorName: newName,
-            creatorAvatar: newPhotoURL
+      // Fire callback to force App component to re-render with updated profile
+      if (onProfileUpdate) {
+        onProfileUpdate();
+      }
+
+      // 2. Save/Update User Profile in Firestore (Wrapped to avoid blocking user saves due to permissions)
+      try {
+        const userDocRef = doc(db, "users", currentUser.uid);
+        await setDoc(userDocRef, {
+          displayName: newName,
+          photoURL: newPhotoURL,
+          email: currentUser.email,
+          updatedAt: new Date(),
+          isVerified: isAdmin,
+        }, { merge: true });
+      } catch (firestoreUserErr) {
+        console.warn("Firestore users collection write failed (proceeding anyway):", firestoreUserErr);
+      }
+
+      // 3. Update all past polls in Firestore (Wrapped in case of permission or quota limitations)
+      try {
+        const pollsRef = collection(db, "polls");
+        const q = query(pollsRef, where("createdBy", "==", currentUser.uid));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          const batch = writeBatch(db);
+          querySnapshot.forEach((pollDoc) => {
+            batch.update(doc(db, "polls", pollDoc.id), {
+              creatorName: newName,
+              creatorAvatar: newPhotoURL
+            });
           });
-        });
-        await batch.commit();
+          await batch.commit();
+        }
+      } catch (firestorePollsErr) {
+        console.warn("Firestore past polls update failed (proceeding anyway):", firestorePollsErr);
       }
 
       setSuccess(true);

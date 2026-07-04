@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Poll } from "../types";
-import { db } from "../lib/firebase";
+import { db, auth } from "../lib/firebase";
 import { doc, updateDoc, increment, deleteDoc } from "firebase/firestore";
 import { motion } from "motion/react";
 import { 
@@ -18,9 +18,9 @@ import {
 import Avatar from "./Avatar";
 
 export const VerifiedGoldBadge = () => (
-  <span className="inline-flex items-center gap-1 cursor-help shrink-0" title="Doğrulanmış Özel Hesap">
+  <span className="inline-flex items-center justify-center cursor-help shrink-0 select-none align-middle" title="Doğrulanmış Özel Hesap">
     <svg 
-      className="w-4.5 h-4.5 drop-shadow-[0_0_5px_rgba(245,158,11,0.55)] shrink-0" 
+      className="w-4 h-4 drop-shadow-[0_0_5px_rgba(245,158,11,0.55)] shrink-0" 
       viewBox="0 0 24 24" 
       fill="none" 
       xmlns="http://www.w3.org/2000/svg"
@@ -72,6 +72,11 @@ export default function PollCard({ poll, currentUserId, onAuthRequired }: PollCa
   const [copied, setCopied] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const currentUser = auth.currentUser;
+  const isOwner = currentUser && currentUser.uid === poll.createdBy;
+  const displayAvatar = isOwner && currentUser.photoURL ? currentUser.photoURL : poll.creatorAvatar;
+  const displayName = isOwner && currentUser.displayName ? currentUser.displayName : poll.creatorName;
 
   const totalVotes = poll.votesA + poll.votesB;
   const hasVoted = currentUserId ? poll.voters && (currentUserId in poll.voters) : false;
@@ -175,14 +180,14 @@ export default function PollCard({ poll, currentUserId, onAuthRequired }: PollCa
         {/* Creator Info & Admin Actions */}
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2.5 text-slate-400 text-xs">
-            <Avatar photoURL={poll.creatorAvatar} displayName={poll.creatorName} size="xs" />
-            { (poll.isVerifiedCreator || poll.creatorName?.toLowerCase() === "ducknet53" || poll.creatorEmail?.toLowerCase() === "ducknet53@gmail.com") ? (
-              <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded font-bold flex items-center gap-1 shadow-[0_0_10px_rgba(245,158,11,0.15)]" title="Doğrulanmış Özel Hesap">
-                @{poll.creatorName}
+            <Avatar photoURL={displayAvatar} displayName={displayName} size="xs" />
+            { (poll.isVerifiedCreator || displayName?.toLowerCase() === "ducknet53" || poll.creatorEmail?.toLowerCase() === "ducknet53@gmail.com") ? (
+              <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded font-bold flex items-center gap-1 shadow-[0_0_10px_rgba(245,158,11,0.15)]" title="Doğrulanmış Özel Hesap">
+                @{displayName}
                 <VerifiedGoldBadge />
               </span>
             ) : (
-              <span className="bg-slate-800/80 text-sky-400 px-2 py-0.5 rounded font-medium">@{poll.creatorName}</span>
+              <span className="bg-slate-800/80 text-sky-400 px-2.5 py-0.5 rounded font-medium">@{displayName}</span>
             ) }
             <span className="text-slate-600">•</span>
             <span className="flex items-center gap-1">

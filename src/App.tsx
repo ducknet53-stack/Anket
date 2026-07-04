@@ -473,6 +473,7 @@ export default function App() {
         isOpen={isProfileOpen}
         onClose={() => setIsProfileOpen(false)}
         currentUser={user}
+        onProfileUpdate={() => setUser(auth.currentUser ? Object.create(Object.getPrototypeOf(auth.currentUser), Object.getOwnPropertyDescriptors(auth.currentUser)) : null)}
       />
 
     </div>
