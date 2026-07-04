@@ -63,7 +63,7 @@ export default function CreatePollModal({ isOpen, onClose, userId, userDisplayNa
 
     } catch (err: any) {
       console.error("Anket oluşturulurken hata:", err);
-      setError("Anket oluşturulamadı. Lütfen Firebase yetkilerinizi veya ayarlarınızı kontrol edin.");
+      setError(`Anket oluşturulamadı: ${err.message || "Bilinmeyen hata"}. Lütfen Firebase yetkilerinizi veya ayarlarınızı kontrol edin.`);
     } finally {
       setLoading(false);
     }
