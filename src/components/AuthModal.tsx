@@ -70,7 +70,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     } catch (err: any) {
       console.error(err);
       if (err.code !== "auth/popup-closed-by-user") {
-        setError("Google ile giriş yaparken bir hata oluştu.");
+        setError(
+          "Google ile giriş yaparken bir hata oluştu. Tarayıcı veya iframe engellemeleri nedeniyle Google pop-up penceresi engellenmiş olabilir. Lütfen sağ üstteki 'Yeni Sekmede Aç' butonu ile yeni sekmede açarak deneyin ya da e-posta ve şifrenizle kolayca kayıt olup giriş yapın."
+        );
       }
     } finally {
       setLoading(false);
