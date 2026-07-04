@@ -5,7 +5,7 @@ import { collection, query, where, getDocs, writeBatch, doc, setDoc } from "fire
 import { X, Sparkles, User, Check, Edit2, AlertCircle } from "lucide-react";
 import Avatar, { AVATAR_PRESETS } from "./Avatar";
 
-// Helper function to resize and compress selected gallery images to ultra-compact Base64 JPEG
+// Helper function to resize and compress selected gallery images to compact Base64 JPEG
 const resizeAndCompressImage = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -15,8 +15,8 @@ const resizeAndCompressImage = (file: File): Promise<string> => {
       img.src = event.target?.result as string;
       img.onload = () => {
         const canvas = document.createElement("canvas");
-        const MAX_WIDTH = 150;
-        const MAX_HEIGHT = 150;
+        const MAX_WIDTH = 200;
+        const MAX_HEIGHT = 200;
         let width = img.width;
         let height = img.height;
 
@@ -37,7 +37,7 @@ const resizeAndCompressImage = (file: File): Promise<string> => {
         const ctx = canvas.getContext("2d");
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL("image/jpeg", 0.75); // Compact JPEG with 75% quality
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.85); // High-quality 85% JPEG
           resolve(dataUrl);
         } else {
           resolve(event.target?.result as string);
@@ -93,19 +93,43 @@ export default function ProfileModal({ isOpen, onClose, currentUser }: ProfileMo
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Check size limit (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setError("Seçilen dosya çok büyük. Lütfen daha küçük bir resim seçin.");
+    // Check size limit (max 10MB for Imgbb)
+    if (file.size > 10 * 1024 * 1024) {
+      setError("Seçilen dosya çok büyük. Lütfen 10MB'den küçük bir resim seçin.");
       return;
     }
 
+    setLoading(true);
+    setError("");
     try {
-      setError("");
+      // 1. Resize and compress local file first for instant uploading
       const compressedBase64 = await resizeAndCompressImage(file);
-      setCustomPhotoData(compressedBase64);
-    } catch (err) {
+      const base64Clean = compressedBase64.split(",")[1];
+
+      // 2. Upload to Imgbb using the user's provided API Key
+      const formData = new FormData();
+      formData.append("image", base64Clean);
+
+      const response = await fetch("https://api.imgbb.com/1/upload?key=3efffb511b52bb2ef700ca0175d88026", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Imgbb sunucusu bağlantıyı reddetti.");
+      }
+
+      const resData = await response.json();
+      if (resData.success && resData.data?.url) {
+        setCustomPhotoData(resData.data.url);
+      } else {
+        throw new Error(resData.error?.message || "Resim servisi hata döndürdü.");
+      }
+    } catch (err: any) {
       console.error("Resim yükleme hatası:", err);
-      setError("Resim okunurken bir hata oluştu.");
+      setError(`Resim yüklenirken bir hata oluştu: ${err.message || "Bilinmeyen hata"}`);
+    } finally {
+      setLoading(false);
     }
   };
 

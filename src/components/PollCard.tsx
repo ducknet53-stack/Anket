@@ -18,21 +18,41 @@ import {
 import Avatar from "./Avatar";
 
 export const VerifiedGoldBadge = () => (
-  <span className="inline-flex items-center gap-1 cursor-help" title="Doğrulanmış Özel Hesap">
+  <span className="inline-flex items-center gap-1 cursor-help shrink-0" title="Doğrulanmış Özel Hesap">
     <svg 
-      className="w-4.5 h-4.5 drop-shadow-[0_0_4px_rgba(234,179,8,0.7)] shrink-0" 
+      className="w-4.5 h-4.5 drop-shadow-[0_0_5px_rgba(245,158,11,0.55)] shrink-0" 
       viewBox="0 0 24 24" 
       fill="none" 
       xmlns="http://www.w3.org/2000/svg"
     >
+      <defs>
+        <linearGradient id="goldGradBadge" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FFE066" />
+          <stop offset="35%" stopColor="#F5A623" />
+          <stop offset="75%" stopColor="#D07C00" />
+          <stop offset="100%" stopColor="#9B5100" />
+        </linearGradient>
+      </defs>
+      {/* 12-pointed rounded star shape */}
       <path 
-        d="M12 2l1.9 2.2 2.9-.4.9 2.8 2.6 1.3-.4 2.9 1.7 2.4-1.7 2.4.4 2.9-2.6 1.3-.9 2.8-2.9-.4L12 22l-1.9-2.2-2.9.4-.9-2.8-2.6-1.3.4-2.9-1.7-2.4 1.7-2.4-.4-2.9 2.6-1.3.9-2.8 2.9.4L12 2z" 
-        fill="#f59e0b" 
+        d="M12 2l1.9 1.8 2.5-.4.8 2.4 2.4.8-.4 2.5 1.8 1.9-1.8 1.9.4 2.5-2.4.8-.8 2.4-2.5-.4L12 22l-1.9-1.8-2.5.4-.8-2.4-2.4-.8.4-2.5-1.8-1.9 1.8-1.9-.4-2.5 2.4-.8.8-2.4 2.5.4L12 2z" 
+        fill="url(#goldGradBadge)" 
+        stroke="#78350f"
+        strokeWidth="0.5"
       />
+      {/* Black 3D backdrop/shadow of checkmark */}
       <path 
         d="M9 12.5l2 2 4.5-4.5" 
         stroke="#020617" 
-        strokeWidth="3.2" 
+        strokeWidth="3.4" 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+      />
+      {/* Clean white checkmark */}
+      <path 
+        d="M9 12.5l2 2 4.5-4.5" 
+        stroke="#FFFFFF" 
+        strokeWidth="2.1" 
         strokeLinecap="round" 
         strokeLinejoin="round" 
       />
