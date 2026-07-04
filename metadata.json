@@ -1,0 +1,6 @@
+{
+  "name": "Anket Savaşları",
+  "description": "Neon mavi ve turuncu renkleriyle modern, rekabetçi ve eğlenceli bir anket oluşturma, oy verme ve sosyal paylaşım platformu.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
