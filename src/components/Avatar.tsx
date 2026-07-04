@@ -58,8 +58,10 @@ export default function Avatar({ photoURL, displayName, size = "md", className =
         <img 
           src={photoURL} 
           alt={displayName || "User"} 
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover pointer-events-none select-none"
           referrerPolicy="no-referrer"
+          draggable="false"
+          onContextMenu={(e) => e.preventDefault()}
         />
       </div>
     );

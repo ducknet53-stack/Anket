@@ -183,22 +183,22 @@ export default function App() {
                 <button
                   id="header-profile-btn"
                   onClick={() => setIsProfileOpen(true)}
-                  className="flex items-center gap-2 p-1 md:p-1.5 pr-2 md:pr-3 bg-slate-950/60 hover:bg-slate-900/80 text-left border border-slate-800/80 hover:border-sky-500/30 rounded-2xl transition-all cursor-pointer group"
+                  className="flex items-center gap-2.5 p-1.5 md:p-2 pr-3 md:pr-4 bg-slate-950/60 hover:bg-slate-900/80 text-left border border-slate-800/80 hover:border-sky-500/30 rounded-2xl transition-all cursor-pointer group shadow-[0_0_15px_rgba(14,165,233,0.05)]"
                   title="Profil Ayarlarını Aç"
                 >
-                  <Avatar photoURL={user.photoURL} displayName={user.displayName} size="sm" />
-                  <div className="flex flex-col">
+                  <Avatar photoURL={user.photoURL} displayName={user.displayName} size="md" />
+                  <div className="flex flex-col justify-center">
                     {user.email?.toLowerCase() === "ducknet53@gmail.com" ? (
-                      <span className="text-xs font-bold text-amber-400 flex items-center gap-1">
+                      <span className="text-xs md:text-sm font-bold text-amber-400 inline-flex items-center gap-1.5 select-none">
                         {user.displayName || "ducknet53"}
                         <VerifiedGoldBadge />
                       </span>
                     ) : (
-                      <span className="text-xs font-bold text-slate-200 group-hover:text-sky-400 transition-colors truncate max-w-[80px] sm:max-w-[120px]">
+                      <span className="text-xs md:text-sm font-bold text-slate-200 group-hover:text-sky-400 transition-colors truncate max-w-[90px] sm:max-w-[140px] select-none">
                         {user.displayName || user.email?.split("@")[0]}
                       </span>
                     )}
-                    <span className="text-[9px] text-slate-500 font-mono leading-none mt-0.5">
+                    <span className="text-[9px] md:text-[10px] text-slate-500 font-mono leading-none mt-1 select-none">
                       {user.email?.toLowerCase() === "ducknet53@gmail.com" ? "Yönetici 👑" : "Profil Ayarları ⚙️"}
                     </span>
                   </div>

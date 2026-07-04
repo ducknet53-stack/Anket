@@ -18,7 +18,7 @@ import {
 import Avatar from "./Avatar";
 
 export const VerifiedGoldBadge = () => (
-  <span className="inline-flex items-center justify-center cursor-help shrink-0 select-none align-middle" title="Doğrulanmış Özel Hesap">
+  <span className="inline-flex items-center justify-center cursor-help shrink-0 select-none" title="Doğrulanmış Özel Hesap">
     <svg 
       className="w-4 h-4 drop-shadow-[0_0_5px_rgba(245,158,11,0.55)] shrink-0" 
       viewBox="0 0 24 24" 
@@ -33,24 +33,24 @@ export const VerifiedGoldBadge = () => (
           <stop offset="100%" stopColor="#9B5100" />
         </linearGradient>
       </defs>
-      {/* 12-pointed rounded star shape */}
+      {/* Symmetrical 12-pointed rounded starburst shape */}
       <path 
-        d="M12 2l1.9 1.8 2.5-.4.8 2.4 2.4.8-.4 2.5 1.8 1.9-1.8 1.9.4 2.5-2.4.8-.8 2.4-2.5-.4L12 22l-1.9-1.8-2.5.4-.8-2.4-2.4-.8.4-2.5-1.8-1.9 1.8-1.9-.4-2.5 2.4-.8.8-2.4 2.5.4L12 2z" 
+        d="M12,2 L14.12,4.08 L17,3.34 L17.8,6.2 L20.66,7 L19.92,9.88 L22,12 L19.92,14.12 L20.66,17 L17.8,17.8 L17,20.66 L14.12,19.92 L12,22 L9.88,19.92 L7,20.66 L6.2,17.8 L3.34,17 L4.08,14.12 L2,12 L4.08,9.88 L3.34,7 L6.2,6.2 L7,3.34 L9.88,4.08 Z" 
         fill="url(#goldGradBadge)" 
         stroke="#78350f"
         strokeWidth="0.5"
       />
-      {/* Black 3D backdrop/shadow of checkmark */}
+      {/* Symmetrical 3D checkmark shadow layer */}
       <path 
-        d="M9 12.5l2 2 4.5-4.5" 
-        stroke="#020617" 
-        strokeWidth="3.4" 
+        d="M9.2 13.2l2 2 4.5-4.5" 
+        stroke="#78350F" 
+        strokeWidth="2.8" 
         strokeLinecap="round" 
         strokeLinejoin="round" 
       />
-      {/* Clean white checkmark */}
+      {/* Symmetrical 3D checkmark front white layer */}
       <path 
-        d="M9 12.5l2 2 4.5-4.5" 
+        d="M9.2 12.2l2 2 4.5-4.5" 
         stroke="#FFFFFF" 
         strokeWidth="2.1" 
         strokeLinecap="round" 
