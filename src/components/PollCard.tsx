@@ -16,6 +16,36 @@ import {
   Calendar
 } from "lucide-react";
 
+export const VerifiedGoldBadge = () => (
+  <span className="inline-flex items-center gap-1 cursor-help" title="Doğrulanmış Özel Hesap">
+    <svg 
+      className="w-4 h-4 drop-shadow-[0_0_5px_rgba(234,179,8,0.6)] shrink-0" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path 
+        d="M12 2l1.9 2.2 2.9-.4.9 2.8 2.6 1.3-.4 2.9 1.7 2.4-1.7 2.4.4 2.9-2.6 1.3-.9 2.8-2.9-.4L12 22l-1.9-2.2-2.9.4-.9-2.8-2.6-1.3.4-2.9-1.7-2.4 1.7-2.4-.4-2.9 2.6-1.3.9-2.8 2.9.4L12 2z" 
+        fill="url(#goldGrad)" 
+      />
+      <path 
+        d="M9 12.5l2 2 4.5-4.5" 
+        stroke="#1e1b4b" 
+        strokeWidth="3" 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+      />
+      <defs>
+        <linearGradient id="goldGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#fbbf24" />
+          <stop offset="50%" stopColor="#f59e0b" />
+          <stop offset="100%" stopColor="#b45309" />
+        </linearGradient>
+      </defs>
+    </svg>
+  </span>
+);
+
 interface PollCardProps {
   key?: string;
   poll: Poll;
@@ -131,7 +161,14 @@ export default function PollCard({ poll, currentUserId, onAuthRequired }: PollCa
         {/* Creator Info & Admin Actions */}
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2 text-slate-400 text-xs">
-            <span className="bg-slate-800/80 text-sky-400 px-2 py-0.5 rounded font-medium">@{poll.creatorName}</span>
+            { (poll.isVerifiedCreator || poll.creatorName?.toLowerCase() === "ducknet53" || poll.creatorEmail?.toLowerCase() === "ducknet53@gmail.com") ? (
+              <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded font-bold flex items-center gap-1 shadow-[0_0_10px_rgba(245,158,11,0.15)]" title="Doğrulanmış Özel Hesap">
+                @{poll.creatorName}
+                <VerifiedGoldBadge />
+              </span>
+            ) : (
+              <span className="bg-slate-800/80 text-sky-400 px-2 py-0.5 rounded font-medium">@{poll.creatorName}</span>
+            ) }
             <span className="text-slate-600">•</span>
             <span className="flex items-center gap-1">
               <Calendar className="w-3 h-3" />

@@ -12,7 +12,6 @@ import {
   Search, 
   HelpCircle, 
   User as UserIcon, 
-  Settings, 
   Info,
   Twitter,
   Youtube,
@@ -24,8 +23,7 @@ import {
 
 import AuthModal from "./components/AuthModal";
 import CreatePollModal from "./components/CreatePollModal";
-import FirebaseConfigModal from "./components/FirebaseConfigModal";
-import PollCard from "./components/PollCard";
+import PollCard, { VerifiedGoldBadge } from "./components/PollCard";
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -37,7 +35,6 @@ export default function App() {
   // Modals state
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isConfigOpen, setIsConfigOpen] = useState(false);
 
   // Copy-link notifications
   const [toastMessage, setToastMessage] = useState("");
@@ -173,25 +170,24 @@ export default function App() {
 
           {/* Actions */}
           <div className="flex items-center gap-2 md:gap-4">
-            
-            {/* Firebase Config Settings button */}
-            <button
-              id="open-config-modal-btn"
-              onClick={() => setIsConfigOpen(true)}
-              className="p-2 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-sky-400 rounded-xl border border-slate-800 transition-all cursor-pointer"
-              title="Firebase Bağlantı Ayarları"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
 
             {user ? (
               <div className="flex items-center gap-2">
                 {/* User Info (hidden on small screens) */}
                 <div className="hidden sm:flex flex-col items-end text-right">
-                  <span className="text-xs font-semibold text-slate-300">
-                    {user.displayName || user.email?.split("@")[0]}
+                  {user.email?.toLowerCase() === "ducknet53@gmail.com" ? (
+                    <span className="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-[0_0_10px_rgba(245,158,11,0.15)]">
+                      {user.displayName || "ducknet53"}
+                      <VerifiedGoldBadge />
+                    </span>
+                  ) : (
+                    <span className="text-xs font-semibold text-slate-300">
+                      {user.displayName || user.email?.split("@")[0]}
+                    </span>
+                  )}
+                  <span className="text-[10px] text-slate-500 font-mono">
+                    {user.email?.toLowerCase() === "ducknet53@gmail.com" ? "Yönetici" : "Oyuncu"}
                   </span>
-                  <span className="text-[10px] text-slate-500 font-mono">Oyuncu</span>
                 </div>
                 {/* Logout Button */}
                 <button
@@ -454,11 +450,6 @@ export default function App() {
         userId={user?.uid || ""}
         userDisplayName={user?.displayName || null}
         userEmail={user?.email || null}
-      />
-
-      <FirebaseConfigModal 
-        isOpen={isConfigOpen} 
-        onClose={() => setIsConfigOpen(false)} 
       />
 
     </div>

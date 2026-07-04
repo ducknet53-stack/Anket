@@ -32,7 +32,8 @@ export default function CreatePollModal({ isOpen, onClose, userId, userDisplayNa
     setError("");
 
     try {
-      const creatorName = userDisplayName || (userEmail ? userEmail.split("@")[0] : "Anonim");
+      const isVerified = userEmail?.toLowerCase() === "ducknet53@gmail.com";
+      const creatorName = isVerified ? "ducknet53" : (userDisplayName || (userEmail ? userEmail.split("@")[0] : "Anonim"));
       
       const newPoll = {
         question: question.trim(),
@@ -42,6 +43,8 @@ export default function CreatePollModal({ isOpen, onClose, userId, userDisplayNa
         votesB: 0,
         createdBy: userId,
         creatorName: creatorName,
+        creatorEmail: userEmail || "",
+        isVerifiedCreator: isVerified,
         createdAt: serverTimestamp(),
         voters: {}
       };
