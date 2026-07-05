@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { auth, db } from "./lib/firebase";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import { collection, onSnapshot, query, doc, setDoc } from "firebase/firestore";
 import { Poll } from "./types";
 import { motion, AnimatePresence } from "motion/react";
 import { 
@@ -33,6 +33,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "my">("all");
+  const [usersCache, setUsersCache] = useState<Record<string, { displayName: string; photoURL: string; isVerified?: boolean }>>({});
   
   // Modals state
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -45,11 +46,50 @@ export default function App() {
   // Check URL params for a shared poll
   const [highlightedPollId, setHighlightedPollId] = useState<string | null>(null);
 
-  // Listen to Auth state
+  // Listen to Auth state and sync profiles
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        try {
+          const isVerified = currentUser.email?.toLowerCase() === "ducknet53@gmail.com";
+          const userDocRef = doc(db, "users", currentUser.uid);
+          await setDoc(userDocRef, {
+            displayName: currentUser.displayName || currentUser.email?.split("@")[0] || "Anonim",
+            photoURL: currentUser.photoURL || "",
+            email: currentUser.email || "",
+            updatedAt: new Date(),
+            isVerified: isVerified
+          }, { merge: true });
+        } catch (syncErr) {
+          console.warn("User profile sync failed on auth change:", syncErr);
+        }
+      }
     });
+    return () => unsubscribe();
+  }, []);
+
+  // Listen to Firestore Users collection for reactive display name / avatar updates
+  useEffect(() => {
+    const usersCol = collection(db, "users");
+    const unsubscribe = onSnapshot(
+      usersCol,
+      (snapshot) => {
+        const cache: Record<string, { displayName: string; photoURL: string; isVerified?: boolean }> = {};
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          cache[doc.id] = {
+            displayName: data.displayName || "",
+            photoURL: data.photoURL || "",
+            isVerified: data.isVerified || false
+          };
+        });
+        setUsersCache(cache);
+      },
+      (error) => {
+        console.warn("Firestore users cache loading error:", error);
+      }
+    );
     return () => unsubscribe();
   }, []);
 
@@ -146,6 +186,20 @@ export default function App() {
       sortedAndFilteredPolls.unshift(highlightedPoll);
     }
   }
+
+  // Enrich polls with latest reactive user cache details (fixes logout/profile update sync issue)
+  const enrichedPolls = sortedAndFilteredPolls.map((poll) => {
+    const cachedUser = usersCache[poll.createdBy];
+    if (cachedUser) {
+      return {
+        ...poll,
+        creatorName: cachedUser.displayName || poll.creatorName,
+        creatorAvatar: cachedUser.photoURL || poll.creatorAvatar,
+        isVerifiedCreator: cachedUser.isVerified !== undefined ? cachedUser.isVerified : poll.isVerifiedCreator,
+      };
+    }
+    return poll;
+  });
 
   const totalGlobalVotes = polls.reduce((acc, p) => acc + (p.votesA || 0) + (p.votesB || 0), 0);
 
@@ -361,9 +415,9 @@ export default function App() {
             <div className="w-12 h-12 border-4 border-sky-500/20 border-t-sky-500 rounded-full animate-spin"></div>
             <p className="text-slate-400 text-sm">Savaş alanı yükleniyor...</p>
           </div>
-        ) : sortedAndFilteredPolls.length > 0 ? (
+        ) : enrichedPolls.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {sortedAndFilteredPolls.map((poll) => (
+            {enrichedPolls.map((poll) => (
               <PollCard
                 key={poll.id}
                 poll={poll}

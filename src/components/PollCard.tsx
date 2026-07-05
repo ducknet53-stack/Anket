@@ -181,7 +181,7 @@ export default function PollCard({ poll, currentUserId, onAuthRequired }: PollCa
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2.5 text-slate-400 text-xs">
             <Avatar photoURL={displayAvatar} displayName={displayName} size="xs" />
-            { (poll.isVerifiedCreator || displayName?.toLowerCase() === "ducknet53" || poll.creatorEmail?.toLowerCase() === "ducknet53@gmail.com") ? (
+            { (poll.isVerifiedCreator || displayName?.toLowerCase() === "ducknet53" || displayName?.toLowerCase() === "duckanketgo" || poll.creatorEmail?.toLowerCase() === "ducknet53@gmail.com") ? (
               <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded font-bold flex items-center gap-1 shadow-[0_0_10px_rgba(245,158,11,0.15)]" title="Doğrulanmış Özel Hesap">
                 @{displayName}
                 <VerifiedGoldBadge />
